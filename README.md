@@ -10,27 +10,17 @@ This HelloID Service Automation Delegated Form provides an Active Directory repo
 * [All-in-one PowerShell setup script](#all-in-one-powershell-setup-script)
   * [Getting started](#getting-started)
 * [Post-setup configuration](#post-setup-configuration)
+* [Manual resources](#manual-resources)
 
 
 ## All-in-one PowerShell setup script
 The PowerShell script "createform.ps1" contains a complete PowerShell script using the HelloID API to create the complete Form including user defined variables, tasks and data sources.
 
+_Please note that this script asumes none of the required resources do exists within HelloID. The script does not contain versioning or source control_
+
 ### Getting started
- 1. Download the script "createform.ps1"
- 2. Open the script in your favorite PowerShell console / editor
- 3. Open your HelloID portal
- 4. Get or create your own [API Key and Secret](https://docs.helloid.com/hc/en-us/articles/360002008873-API-Keys-Overview)
- 5. Update the following connection details in the all-in-one PowerShell script
- <table>
-  <tr><td><strong>Line</strong></td><td><strong>Variable</strong></td><td><strong>Example</strong></td><td><strong>Description</strong></td></tr>
-  <tr><td>2</td><td>$PortalBaseUrl</td><td>https://customer01.helloid.com</td><td>Your own HelloID portal URL</td></tr>
-  <tr><td>3</td><td>$apiKey</td><td></td><td>Your own HelloID API Key</td></tr>
-  <tr><td>4</td><td>$apiSecret</td><td></td><td>Your own HelloID API Secret</td></tr>
-  <tr><td>5</td><td>$delegatedFormAccessGroupNames</td><td>@("Users", "HID_administrators")</td><td>Array of local HelloID group name giving access to this new Delegated Form</td></tr>
-</table>
- 6. Run the all-in-one PowerShell script
- 
- _Please note that this script asumes none of the required resources do exists within HelloID. The script does not contain versioning or source control_
+Please follow the documentation steps on [HelloID Docs](https://docs.helloid.com/hc/en-us/articles/360017556559-Service-automation-GitHub-resources) in order to setup and run the
+
 
 ## Post-setup configuration
 After the all-in-one PowerShell script has run and created all the required resources. The following items need to be configured according to your own environment
@@ -40,3 +30,12 @@ After the all-in-one PowerShell script has run and created all the required reso
   <tr><td>HIDreportFolder</td><td>C:\HIDreports\</td><td>Local folder on HelloID Agent server for exporting CSV reports</td></tr>
   <tr><td>ADusersReportOU</td><td>[{ "OU": "OU=Employees,OU=Users,OU=Enyoi,DC=enyoi-media,DC=local"},{ "OU": "OU=Disabled,OU=Users,OU=Enyoi,DC=enyoi-media,DC=local"},{"OU": "OU=External,OU=Users,OU=Enyoi,DC=enyoi-media,DC=local"}]</td><td>Array of Active Directory OUs for scoping shown AD user accounts in this report</td></tr>
 </table>
+
+## Manual resources
+This Delegated Form uses the following resources in order to run
+
+### Task data source 'AD-user-generate-table-report-not-logged-on-120-days'
+This task data source runs an Active Directory query to select the AD user accounts that match this report. It uses an array of Active Directory OU's specified as HelloID user defined variable named _"ADusersReportOU"_ to specify the report scoping.
+
+### Delegated form task 'AD-export-report-accounts-not-logged-on-120-days'
+This delegated form task runs the same Active Directory query as the task data source (AD query is defined at two places) and export the data to a local CSV file if selected in the form.
