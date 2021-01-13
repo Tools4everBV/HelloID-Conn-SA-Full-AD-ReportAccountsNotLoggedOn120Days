@@ -1,72 +1,76 @@
 [
     {
-      "templateOptions": {},
-      "type": "markdown",
-      "summaryVisibility": "Show",
-      "body": "The following report will show local AD accounts that have not logged on for at least 120 days. Please wait while the data is loading...",
-      "requiresTemplateOptions": false
+        "templateOptions":  {
+
+                            },
+        "type":  "markdown",
+        "summaryVisibility":  "Show",
+        "body":  "The following report will show local AD accounts that have not logged on for at least 120 days. Please wait while the data is loading...",
+        "requiresTemplateOptions":  false
     },
     {
-      "key": "grid",
-      "templateOptions": {
-        "label": "Results",
-        "grid": {
-          "columns": [
-            {
-              "headerName": "CanonicalName",
-              "field": "CanonicalName"
-            },
-            {
-              "headerName": "Displayname",
-              "field": "Displayname"
-            },
-            {
-              "headerName": "UserPrincipalName",
-              "field": "UserPrincipalName"
-            },
-            {
-              "headerName": "Department",
-              "field": "Department"
-            },
-            {
-              "headerName": "Title",
-              "field": "Title"
-            },
-            {
-              "headerName": "Enabled",
-              "field": "Enabled"
-            },
-            {
-              "headerName": "LastLogonDate",
-              "field": "LastLogonDate"
-            }
-          ],
-          "height": 500,
-          "rowSelection": "single"
-        },
-        "dataSourceConfig": {
-          "dataSourceGuid": "cd4b4d7a-5ca5-4385-4ebf-08d85bdd7a93",
-          "input": {
-            "propertyInputs": []
-          }
-        },
-        "useFilter": true,
-        "useDefault": false
-      },
-      "type": "grid",
-      "summaryVisibility": "Hide element",
-      "requiresTemplateOptions": true
+        "key":  "grid",
+        "templateOptions":  {
+                                "label":  "Results",
+                                "grid":  {
+                                             "columns":  [
+                                                             {
+                                                                 "headerName":  "CanonicalName",
+                                                                 "field":  "CanonicalName"
+                                                             },
+                                                             {
+                                                                 "headerName":  "Displayname",
+                                                                 "field":  "Displayname"
+                                                             },
+                                                             {
+                                                                 "headerName":  "UserPrincipalName",
+                                                                 "field":  "UserPrincipalName"
+                                                             },
+                                                             {
+                                                                 "headerName":  "Department",
+                                                                 "field":  "Department"
+                                                             },
+                                                             {
+                                                                 "headerName":  "Title",
+                                                                 "field":  "Title"
+                                                             },
+                                                             {
+                                                                 "headerName":  "Enabled",
+                                                                 "field":  "Enabled"
+                                                             },
+                                                             {
+                                                                 "headerName":  "LastLogonDate",
+                                                                 "field":  "LastLogonDate"
+                                                             }
+                                                         ],
+                                             "height":  500,
+                                             "rowSelection":  "single"
+                                         },
+                                "dataSourceConfig":  {
+                                                         "dataSourceGuid":  "$dataSourceGuid_0",
+                                                         "input":  {
+                                                                       "propertyInputs":  [
+
+                                                                                          ]
+                                                                   }
+                                                     },
+                                "useFilter":  true,
+                                "useDefault":  false
+                            },
+        "type":  "grid",
+        "summaryVisibility":  "Hide element",
+        "requiresTemplateOptions":  true
     },
     {
-      "key": "exportReport",
-      "templateOptions": {
-        "label": "Export report (local export on HelloID Agent server)",
-        "useSwitch": true,
-        "checkboxLabel": "Yes",
-        "mustBeTrue": true
-      },
-      "type": "boolean",
-      "summaryVisibility": "Show",
-      "requiresTemplateOptions": true
+        "key":  "exportReport",
+        "templateOptions":  {
+                                "label":  "Export report (local export on HelloID Agent server)",
+                                "useSwitch":  true,
+                                "checkboxLabel":  "Yes",
+                                "mustBeTrue":  true
+                            },
+        "type":  "boolean",
+        "summaryVisibility":  "Show",
+        "requiresTemplateOptions":  true
     }
-  ]
+]
