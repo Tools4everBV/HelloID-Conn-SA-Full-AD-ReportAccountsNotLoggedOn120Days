@@ -6,7 +6,9 @@
         "type":  "markdown",
         "summaryVisibility":  "Show",
         "body":  "The following report will show local AD accounts that have not logged on for at least 120 days. Please wait while the data is loading...",
-        "requiresTemplateOptions":  false
+        "requiresTemplateOptions":  false,
+        "requiresKey":  false,
+        "requiresDataSource":  false
     },
     {
         "key":  "grid",
@@ -59,7 +61,9 @@
                             },
         "type":  "grid",
         "summaryVisibility":  "Hide element",
-        "requiresTemplateOptions":  true
+        "requiresTemplateOptions":  true,
+        "requiresKey":  true,
+        "requiresDataSource":  true
     },
     {
         "key":  "exportReport",
@@ -71,6 +75,8 @@
                             },
         "type":  "boolean",
         "summaryVisibility":  "Show",
-        "requiresTemplateOptions":  true
+        "requiresTemplateOptions":  true,
+        "requiresKey":  true,
+        "requiresDataSource":  false
     }
 ]

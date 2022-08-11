@@ -1,6 +1,10 @@
 [
     {
-        "key":  "LastLogonDate",
+        "key":  "Displayname",
+        "type":  0
+    },
+    {
+        "key":  "Department",
         "type":  0
     },
     {
@@ -8,7 +12,11 @@
         "type":  0
     },
     {
-        "key":  "Department",
+        "key":  "CanonicalName",
+        "type":  0
+    },
+    {
+        "key":  "SamAccountName",
         "type":  0
     },
     {
@@ -20,15 +28,7 @@
         "type":  0
     },
     {
-        "key":  "Displayname",
-        "type":  0
-    },
-    {
-        "key":  "SamAccountName",
-        "type":  0
-    },
-    {
-        "key":  "CanonicalName",
+        "key":  "LastLogonDate",
         "type":  0
     }
 ]

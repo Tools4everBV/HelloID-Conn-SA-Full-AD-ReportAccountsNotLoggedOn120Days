@@ -7,6 +7,7 @@ This HelloID Service Automation Delegated Form provides an Active Directory repo
 ## Versioning
 | Version | Description | Date |
 | - | - | - |
+| 1.0.2   | Added version number and updated code for SA-agent and auditlogging | 2022/08/03  |
 | 1.0.1   | Added version number and updated all-in-one script | 2021/11/04  |
 | 1.0.0   | Initial release | 2020/12/01  |
 
@@ -44,7 +45,7 @@ This Delegated Form uses the following resources in order to run
 ### Powershell data source 'AD-user-generate-table-report-not-logged-on-120-days'
 This Powershell data source runs an Active Directory query to select the AD user accounts that match this report. It uses an array of Active Directory OU's specified as HelloID user defined variable named _"ADusersReportOU"_ to specify the report scoping.
 
-### Delegated form task 'AD-export-report-accounts-not-logged-on-120-days'
+### Delegated form task 'AD - Report - Accounts that have not logged on for at least 120 days'
 This delegated form task runs the same Active Directory query as the task data source (AD query is defined at two places) and export the data to a local CSV file if selected in the form.
 
 ## Getting help
