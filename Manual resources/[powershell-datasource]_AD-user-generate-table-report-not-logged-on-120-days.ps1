@@ -1,6 +1,6 @@
 try {
     $lastDate = (Get-Date).AddDays(-120)
-    $filter = {lastLogon -le $lastDate}
+    $filter = {lastLogonDate -le $lastDate}
     $properties = "CanonicalName", "Displayname", "UserPrincipalName", "SamAccountName", "Department", "Title", "Enabled", "LastLogonDate"
     
     $ous = $ADusersReportOU | ConvertFrom-Json
