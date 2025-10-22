@@ -335,7 +335,7 @@ foreach ($item in $globalHelloIDVariables) {
 $tmpPsScript = @'
 try {
     $lastDate = (Get-Date).AddDays(-120)
-    $filter = {lastLogon -le $lastDate}
+    $filter = {lastLogonDate -le $lastDate}
     $properties = "CanonicalName", "Displayname", "UserPrincipalName", "SamAccountName", "Department", "Title", "Enabled", "LastLogonDate"
     
     $ous = $ADusersReportOU | ConvertFrom-Json
@@ -412,7 +412,7 @@ foreach($category in $delegatedFormCategories) {
         $uri = ($script:PortalBaseUrl +"api/v1/delegatedformcategories/$category")
         $response = Invoke-RestMethod -Method Get -Uri $uri -Headers $script:headers -ContentType "application/json" -Verbose:$false
         $response = $response | Where-Object {$_.name.en -eq $category}
-	
+        
         $tmpGuid = $response.delegatedFormCategoryGuid
         $delegatedFormCategoryGuids += $tmpGuid
         
