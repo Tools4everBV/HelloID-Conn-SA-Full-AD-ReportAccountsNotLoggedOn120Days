@@ -328,8 +328,8 @@ foreach ($item in $globalHelloIDVariables) {
 $tmpPsScript = @'
 #######################################################################
 # Template: HelloID SA Powershell data source
-# Name: report-ad-users-that-have-never-logged-in | AD-Get-All-Users-Never-Logged-On
-# Date: 17-02-2026
+# Name: report-ad-users-not-logged-on-120-days | AD-Get-Users-Not-Logged-On-120-Days
+# Date: 23-02-2026
 #######################################################################
 
 # For basic information about powershell data sources see:
