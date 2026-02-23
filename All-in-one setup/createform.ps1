@@ -6,8 +6,8 @@
 $portalUrl = "https://CUSTOMER.helloid.com"
 $apiKey = "API_KEY"
 $apiSecret = "API_SECRET"
-$delegatedFormAccessGroupNames = @("Users") #Only unique names are supported. Groups must exist!
-$delegatedFormCategories = @("Reporting","Active Directory") #Only unique names are supported. Categories will be created if not exists
+$delegatedFormAccessGroupNames = @("") #Only unique names are supported. Groups must exist!
+$delegatedFormCategories = @("Active Directory","Reporting") #Only unique names are supported. Categories will be created if not exists
 $script:debugLogging = $false #Default value: $false. If $true, the HelloID resource GUIDs will be shown in the logging
 $script:duplicateForm = $false #Default value: $false. If $true, the HelloID resource names will be changed to import a duplicate Form
 $script:duplicateFormSuffix = "_tmp" #the suffix will be added to all HelloID resource names to generate a duplicate form with different resource names
@@ -16,21 +16,12 @@ $script:duplicateFormSuffix = "_tmp" #the suffix will be added to all HelloID re
 #NOTE: You can also update the HelloID Global variable values afterwards in the HelloID Admin Portal: https://<CUSTOMER>.helloid.com/admin/variablelibrary
 $globalHelloIDVariables = [System.Collections.Generic.List[object]]@();
 
-#Global variable #1 >> ADusersReportOU
+#Global variable #1 >> AdUsersReportOu
 $tmpName = @'
-ADusersReportOU
+AdUsersReportOu
 '@ 
 $tmpValue = @'
-[{ "OU": "OU=Users,OU=HelloID Training,DC=veeken,DC=local"},{"OU": "OU=Disabled Users,OU=HelloID Training,DC=veeken,DC=local"}]
-'@ 
-$globalHelloIDVariables.Add([PSCustomObject]@{name = $tmpName; value = $tmpValue; secret = "False"});
-
-#Global variable #2 >> HIDreportFolder
-$tmpName = @'
-HIDreportFolder
-'@ 
-$tmpValue = @'
-C:\HIDreports\
+OU=Users,OU=HelloID,DC=testmartijn,DC=local;OU=Users,OU=HelloID Training,DC=testmartijn,DC=local;OU=Disabled users,OU=HelloID Training,DC=testmartijn,DC=local
 '@ 
 $globalHelloIDVariables.Add([PSCustomObject]@{name = $tmpName; value = $tmpValue; secret = "False"});
 
@@ -171,6 +162,7 @@ function Invoke-HelloIDDatasource {
         [parameter()][String][AllowEmptyString()]$DatasourcePsScript,        
         [parameter()][String][AllowEmptyString()]$DatasourceInput,
         [parameter()][String][AllowEmptyString()]$AutomationTaskGuid,
+        [parameter()][String][AllowEmptyString()]$DatasourceRunInCloud,
         [parameter(Mandatory)][Ref]$returnObject
     )
 
@@ -197,6 +189,7 @@ function Invoke-HelloIDDatasource {
                 value              = (ConvertFrom-Json-WithEmptyArray($DatasourceStaticValue));
                 script             = $DatasourcePsScript;
                 input              = (ConvertFrom-Json-WithEmptyArray($DatasourceInput));
+                runInCloud         = $DatasourceRunInCloud;
             }
             $body = ConvertTo-Json -InputObject $body -Depth 100
       
@@ -331,21 +324,55 @@ foreach ($item in $globalHelloIDVariables) {
 
 
 <# Begin: HelloID Data sources #>
-<# Begin: DataSource "AD-user-generate-table-report-not-logged-on-120-days" #>
+<# Begin: DataSource "report-ad-users-not-logged-on-120-days | AD-Get-Users-Not-Logged-On-120-Days" #>
 $tmpPsScript = @'
+#######################################################################
+# Template: HelloID SA Powershell data source
+# Name: report-ad-users-that-have-never-logged-in | AD-Get-All-Users-Never-Logged-On
+# Date: 17-02-2026
+#######################################################################
+
+# For basic information about powershell data sources see:
+# https://docs.helloid.com/en/service-automation/dynamic-forms/data-sources/powershell-data-sources.html
+
+# Service automation variables:
+# https://docs.helloid.com/en/service-automation/service-automation-variables.html
+
+#region init
+
+$VerbosePreference = "SilentlyContinue"
+$InformationPreference = "Continue"
+$WarningPreference = "Continue"
+
+$lastDate = (Get-Date).AddDays(-120)
+
+# global variables (Automation --> Variable library):
+$searchOUs = $AdUsersReportOu
+
+# variables configured in form:
+# $formValue1 = $datasource.<formElementKey>.<value>
+# $formValue2 = $datasource.<formElementKey>
+
+#endregion init
+
+#region functions
+
+#endregion functions
+
+#region lookup
 try {
-    $lastDate = (Get-Date).AddDays(-120)
+    $actionMessage = "querying AD for users that have not logged on since $lastDate"
     $filter = {lastLogonDate -le $lastDate}
     $properties = "CanonicalName", "Displayname", "UserPrincipalName", "SamAccountName", "Department", "Title", "Enabled", "LastLogonDate"
     
-    $ous = $ADusersReportOU | ConvertFrom-Json
+    $ous = $searchOUs -split ';'
     $result = foreach($item in $ous) {
-        Get-ADUser -Filter $filter -SearchBase $item.ou -Properties $properties
+        Get-ADUser -Filter $filter -SearchBase $item -Properties $properties
     }
     $resultCount = @($result).Count
     $result = $result | Sort-Object -Property Displayname
     
-    write-information "Result count: $resultCount"
+    Write-information "Result count: $resultCount"
     
     if($resultCount -gt 0){
         foreach($r in $result){
@@ -355,33 +382,38 @@ try {
     } else {
         return
     }    
+    
 } catch {
-    Write-error "Error generating report. Error: $($_.Exception.Message)"
-    return
+    $ex = $PSItem
+    Write-Warning "Error at Line [$($ex.InvocationInfo.ScriptLineNumber)]: $($ex.InvocationInfo.Line). Error: $($ex.Exception.Message)"
+    Write-Error "Error $($actionMessage). Error: $($ex.Exception.Message)"
+    # exit # use when using multiple try/catch and the script must stop
 }
+#endregion lookup
+
 '@ 
 $tmpModel = @'
-[{"key":"Displayname","type":0},{"key":"Department","type":0},{"key":"UserPrincipalName","type":0},{"key":"CanonicalName","type":0},{"key":"SamAccountName","type":0},{"key":"Title","type":0},{"key":"Enabled","type":0},{"key":"LastLogonDate","type":0}]
+[{"key":"Title","type":0},{"key":"SamAccountName","type":0},{"key":"Enabled","type":0},{"key":"Displayname","type":0},{"key":"UserPrincipalName","type":0},{"key":"LastLogonDate","type":0},{"key":"Department","type":0},{"key":"CanonicalName","type":0}]
 '@ 
 $tmpInput = @'
 []
 '@ 
 $dataSourceGuid_0 = [PSCustomObject]@{} 
 $dataSourceGuid_0_Name = @'
-AD-user-generate-table-report-not-logged-on-120-days
+report-ad-users-not-logged-on-120-days | AD-Get-Users-Not-Logged-On-120-Days
 '@ 
-Invoke-HelloIDDatasource -DatasourceName $dataSourceGuid_0_Name -DatasourceType "4" -DatasourceInput $tmpInput -DatasourcePsScript $tmpPsScript -DatasourceModel $tmpModel -returnObject ([Ref]$dataSourceGuid_0) 
-<# End: DataSource "AD-user-generate-table-report-not-logged-on-120-days" #>
+Invoke-HelloIDDatasource -DatasourceName $dataSourceGuid_0_Name -DatasourceType "4" -DatasourceInput $tmpInput -DatasourcePsScript $tmpPsScript -DatasourceModel $tmpModel -DataSourceRunInCloud "False" -returnObject ([Ref]$dataSourceGuid_0) 
+<# End: DataSource "report-ad-users-not-logged-on-120-days | AD-Get-Users-Not-Logged-On-120-Days" #>
 <# End: HelloID Data sources #>
 
-<# Begin: Dynamic Form "AD - Report - Accounts that have not logged on for at least 120 days" #>
+<# Begin: Dynamic Form "Report - AD users not logged on in 120 days" #>
 $tmpSchema = @"
-[{"templateOptions":{},"type":"markdown","summaryVisibility":"Show","body":"The following report will show local AD accounts that have not logged on for at least 120 days. Please wait while the data is loading...","requiresTemplateOptions":false,"requiresKey":false,"requiresDataSource":false},{"key":"grid","templateOptions":{"label":"Results","grid":{"columns":[{"headerName":"CanonicalName","field":"CanonicalName"},{"headerName":"Displayname","field":"Displayname"},{"headerName":"UserPrincipalName","field":"UserPrincipalName"},{"headerName":"Department","field":"Department"},{"headerName":"Title","field":"Title"},{"headerName":"Enabled","field":"Enabled"},{"headerName":"LastLogonDate","field":"LastLogonDate"}],"height":500,"rowSelection":"single"},"dataSourceConfig":{"dataSourceGuid":"$dataSourceGuid_0","input":{"propertyInputs":[]}},"useFilter":true,"useDefault":false},"type":"grid","summaryVisibility":"Hide element","requiresTemplateOptions":true,"requiresKey":true,"requiresDataSource":true},{"key":"exportReport","templateOptions":{"label":"Export report (local export on HelloID Agent server)","useSwitch":true,"checkboxLabel":"Yes","mustBeTrue":true},"type":"boolean","summaryVisibility":"Show","requiresTemplateOptions":true,"requiresKey":true,"requiresDataSource":false}]
+[{"templateOptions":{},"type":"markdown","summaryVisibility":"Show","body":"The following report will show local AD accounts that have not logged on for at least 120 days. Please wait while the data is loading...","requiresTemplateOptions":false,"requiresKey":false,"requiresDataSource":false},{"key":"grid","templateOptions":{"label":"Results","grid":{"columns":[{"headerName":"CanonicalName","field":"CanonicalName"},{"headerName":"Displayname","field":"Displayname"},{"headerName":"UserPrincipalName","field":"UserPrincipalName"},{"headerName":"Department","field":"Department"},{"headerName":"Title","field":"Title"},{"headerName":"Enabled","field":"Enabled"},{"headerName":"LastLogonDate","field":"LastLogonDate"}],"height":500,"rowSelection":"single"},"dataSourceConfig":{"dataSourceGuid":"$dataSourceGuid_0","input":{"propertyInputs":[]}},"useFilter":true,"useDefault":false,"allowCsvDownload":true},"type":"grid","summaryVisibility":"Hide element","requiresTemplateOptions":true,"requiresKey":true,"requiresDataSource":true},{"key":"textInput","templateOptions":{"label":"Reporting only","required":true,"minLength":1,"readonly":true},"type":"input","summaryVisibility":"Show","requiresTemplateOptions":true,"requiresKey":true,"requiresDataSource":false}]
 "@ 
 
 $dynamicFormGuid = [PSCustomObject]@{} 
 $dynamicFormName = @'
-AD - Report - Accounts that have not logged on for at least 120 days
+Report - AD users not logged on in 120 days
 '@ 
 Invoke-HelloIDDynamicForm -FormName $dynamicFormName -FormSchema $tmpSchema  -returnObject ([Ref]$dynamicFormGuid) 
 <# END: Dynamic Form #>
@@ -438,12 +470,12 @@ $delegatedFormCategoryGuids = (ConvertTo-Json -InputObject $delegatedFormCategor
 <# Begin: Delegated Form #>
 $delegatedFormRef = [PSCustomObject]@{guid = $null; created = $null} 
 $delegatedFormName = @'
-AD - Report - Accounts that have not logged on for at least 120 days
+Report - AD users not logged on in 120 days
 '@
 $tmpTask = @'
-{"name":"AD - Report - Accounts that have not logged on for at least 120 days","script":"$exportReport = $form.exportReport\r\ntry {\r\n    if($exportReport -eq \"True\") {\r\n        ## export file properties\r\n        if($HIDreportFolder.EndsWith(\"\\\") -eq $false){\r\n            $HIDreportFolder = $HIDreportFolder + \"\\\"\r\n        }\r\n        \r\n        $timeStamp = $(get-date -f yyyyMMddHHmmss)\r\n        $exportFile = $HIDreportFolder + \"Report_AD_AccountsNotLoggedOn120Days_\" + $timeStamp + \".csv\"\r\n        \r\n        ## Report details\r\n        $lastDate = (Get-Date).AddDays(-120)\r\n        $filter = {lastLogon -le $lastDate}\r\n        $properties = \"CanonicalName\", \"Displayname\", \"UserPrincipalName\", \"SamAccountName\", \"Department\", \"Title\", \"Enabled\", \"LastLogonDate\"\r\n    \r\n        $ous = $ADusersReportOU | ConvertFrom-Json\r\n        $result = foreach($item in $ous) {\r\n            Get-ADUser -Filter $filter -SearchBase $item.ou -Properties $properties\r\n        }\r\n        $resultCount = @($result).Count\r\n        $result = $result | Sort-Object -Property Displayname\r\n        \r\n        ## export details\r\n        $exportData = @()\r\n        if($resultCount -gt 0){\r\n            foreach($r in $result){\r\n                $exportData += [pscustomobject]@{\r\n                    \"CanonicalName\" = $r.CanonicalName;\r\n                    \"Displayname\" = $r.Displayname;\r\n                    \"UserPrincipalName\" = $r.UserPrincipalName;\r\n                    \"SamAccountName\" = $r.SamAccountName;\r\n                    \"Department\" = $r.Department;\r\n                    \"Title\" = $r.Title;\r\n                    \"Enabled\" = $r.Enabled;\r\n                    \"LastLogonDate\" = $r.LastLogonDate;\r\n                }\r\n            }\r\n        }\r\n        \r\n        $exportCount = @($exportData).Count\r\n        Write-Information \"Export row count: $exportCount\"\r\n        \r\n        $exportData = $exportData | Sort-Object -Property productName, userName\r\n        $exportData | Export-Csv -Path $exportFile -Delimiter \";\" -NoTypeInformation\r\n        \r\n        Write-Information \"Report [$exportFile] containing $exportCount records created successfully\"\r\n        $Log = @{\r\n            Action            = \"Undefined\" # optional. ENUM (undefined = default) \r\n            System            = \"ActiveDirectory\" # optional (free format text) \r\n            Message           = \"Report [$exportFile] containing $exportCount records created successfully\" # required (free format text) \r\n            IsError           = $false # optional. Elastic reporting purposes only. (default = $false. $true = Executed action returned an error) \r\n            TargetDisplayName = $exportFile # optional (free format text) \r\n            TargetIdentifier  = \"\" # optional (free format text) \r\n        }\r\n        #send result back  \r\n        Write-Information -Tags \"Audit\" -MessageData $log    \r\n    }\r\n} catch {\r\n    Write-Error \"Error generating report. Error: $($_.Exception.Message)\"\r\n    $Log = @{\r\n        Action            = \"Undefined\" # optional. ENUM (undefined = default) \r\n        System            = \"ActiveDirectory\" # optional (free format text) \r\n        Message           = \"Error generating report [$exportFile]\" # required (free format text) \r\n        IsError           = $true # optional. Elastic reporting purposes only. (default = $false. $true = Executed action returned an error) \r\n        TargetDisplayName = $exportFile # optional (free format text) \r\n        TargetIdentifier  = \"\" # optional (free format text) \r\n    }\r\n    #send result back  \r\n    Write-Information -Tags \"Audit\" -MessageData $log\r\n}","runInCloud":false}
+{"name":"Report - AD users not logged on in 120 days","script":"# No tasks are performed","runInCloud":false}
 '@ 
 
-Invoke-HelloIDDelegatedForm -DelegatedFormName $delegatedFormName -DynamicFormGuid $dynamicFormGuid -AccessGroups $delegatedFormAccessGroupGuids -Categories $delegatedFormCategoryGuids -UseFaIcon "True" -FaIcon "fa fa-info-circle" -task $tmpTask -returnObject ([Ref]$delegatedFormRef) 
+Invoke-HelloIDDelegatedForm -DelegatedFormName $delegatedFormName -DynamicFormGuid $dynamicFormGuid -AccessGroups $delegatedFormAccessGroupGuids -Categories $delegatedFormCategoryGuids -UseFaIcon "True" -FaIcon "fa fa-list" -task $tmpTask -returnObject ([Ref]$delegatedFormRef) 
 <# End: Delegated Form #>
 

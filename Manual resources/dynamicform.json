@@ -57,7 +57,8 @@
                                                                    }
                                                      },
                                 "useFilter":  true,
-                                "useDefault":  false
+                                "useDefault":  false,
+                                "allowCsvDownload":  true
                             },
         "type":  "grid",
         "summaryVisibility":  "Hide element",
@@ -66,14 +67,14 @@
         "requiresDataSource":  true
     },
     {
-        "key":  "exportReport",
+        "key":  "textInput",
         "templateOptions":  {
-                                "label":  "Export report (local export on HelloID Agent server)",
-                                "useSwitch":  true,
-                                "checkboxLabel":  "Yes",
-                                "mustBeTrue":  true
+                                "label":  "Reporting only",
+                                "required":  true,
+                                "minLength":  1,
+                                "readonly":  true
                             },
-        "type":  "boolean",
+        "type":  "input",
         "summaryVisibility":  "Show",
         "requiresTemplateOptions":  true,
         "requiresKey":  true,
