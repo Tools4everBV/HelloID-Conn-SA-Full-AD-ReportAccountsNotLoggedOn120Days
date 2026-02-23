@@ -4,10 +4,6 @@
         "type":  0
     },
     {
-        "key":  "SamAccountName",
-        "type":  0
-    },
-    {
         "key":  "Enabled",
         "type":  0
     },

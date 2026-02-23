@@ -35,7 +35,7 @@ $searchOUs = $AdUsersReportOu
 try {
     $actionMessage = "querying AD for users that have not logged on since $lastDate"
     $filter = {lastLogonDate -le $lastDate}
-    $properties = "CanonicalName", "Displayname", "UserPrincipalName", "SamAccountName", "Department", "Title", "Enabled", "LastLogonDate"
+    $properties = "CanonicalName", "Displayname", "UserPrincipalName", "Department", "Title", "Enabled", "LastLogonDate"
     
     $ous = $searchOUs -split ';'
     $result = foreach($item in $ous) {
@@ -48,7 +48,7 @@ try {
     
     if($resultCount -gt 0){
         foreach($r in $result){
-            $returnObject = @{CanonicalName=$r.CanonicalName; Displayname=$r.Displayname; UserPrincipalName=$r.UserPrincipalName; SamAccountName=$r.SamAccountName; Department=$r.Department; Title=$r.Title; Enabled=$r.Enabled; LastLogonDate=$r.LastLogonDate}
+            $returnObject = @{CanonicalName=$r.CanonicalName; Displayname=$r.Displayname; UserPrincipalName=$r.UserPrincipalName; Department=$r.Department; Title=$r.Title; Enabled=$r.Enabled; LastLogonDate=$r.LastLogonDate}
             Write-output $returnObject
         }
     } else {
@@ -62,4 +62,3 @@ try {
     # exit # use when using multiple try/catch and the script must stop
 }
 #endregion lookup
-
