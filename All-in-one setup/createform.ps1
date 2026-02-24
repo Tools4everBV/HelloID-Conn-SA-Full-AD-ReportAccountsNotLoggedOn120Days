@@ -21,7 +21,7 @@ $tmpName = @'
 AdUsersReportOu
 '@ 
 $tmpValue = @'
-OU=Users,OU=HelloID,DC=testmartijn,DC=local;OU=Users,OU=HelloID Training,DC=testmartijn,DC=local;OU=Disabled users,OU=HelloID Training,DC=testmartijn,DC=local
+OU=Users,OU=HelloID,DC=enyoi,DC=local;OU=Users,OU=HelloID Training,DC=enyoi,DC=local;OU=Disabled users,OU=HelloID Training,DC=enyoi,DC=local
 '@ 
 $globalHelloIDVariables.Add([PSCustomObject]@{name = $tmpName; value = $tmpValue; secret = "False"});
 
@@ -324,11 +324,11 @@ foreach ($item in $globalHelloIDVariables) {
 
 
 <# Begin: HelloID Data sources #>
-<# Begin: DataSource "report-ad-users-not-logged-on-120-days | AD-Get-Users-Not-Logged-On-120-Days" #>
+<# Begin: DataSource "report-ad-users-not-logged-on-in-120-days | AD-Get-Users-Not-Logged-On-120-Days" #>
 $tmpPsScript = @'
 #######################################################################
 # Template: HelloID SA Powershell data source
-# Name: report-ad-users-not-logged-on-120-days | AD-Get-Users-Not-Logged-On-120-Days
+# Name: report-ad-users-not-logged-on-in-120-days | AD-Get-Users-Not-Logged-On-120-Days
 # Date: 23-02-2026
 #######################################################################
 
@@ -399,10 +399,10 @@ $tmpInput = @'
 '@ 
 $dataSourceGuid_0 = [PSCustomObject]@{} 
 $dataSourceGuid_0_Name = @'
-report-ad-users-not-logged-on-120-days | AD-Get-Users-Not-Logged-On-120-Days
+report-ad-users-not-logged-on-in-120-days | AD-Get-Users-Not-Logged-On-120-Days
 '@ 
 Invoke-HelloIDDatasource -DatasourceName $dataSourceGuid_0_Name -DatasourceType "4" -DatasourceInput $tmpInput -DatasourcePsScript $tmpPsScript -DatasourceModel $tmpModel -DataSourceRunInCloud "False" -returnObject ([Ref]$dataSourceGuid_0) 
-<# End: DataSource "report-ad-users-not-logged-on-120-days | AD-Get-Users-Not-Logged-On-120-Days" #>
+<# End: DataSource "report-ad-users-not-logged-on-in-120-days | AD-Get-Users-Not-Logged-On-120-Days" #>
 <# End: HelloID Data sources #>
 
 <# Begin: Dynamic Form "Report - AD users not logged on in 120 days" #>
