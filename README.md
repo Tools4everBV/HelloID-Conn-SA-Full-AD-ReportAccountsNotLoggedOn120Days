@@ -1,55 +1,67 @@
-<!-- Description -->
+# HelloID-Conn-SA-Full-AD-ReportAccountsNotLoggedOn120Days
+
+| :information_source: Information                                                                                                                                                                                                                                                                                                                                                          |
+|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| This repository contains the connector and configuration code only. The implementer is responsible for acquiring the connection details such as username, password, certificate, etc. You might even need to sign a contract or agreement with the supplier before implementing this connector. Please contact the client's application manager to coordinate the connector requirements. |
+
 ## Description
+_HelloID-Conn-SA-Full-AD-ReportAccountsNotLoggedOn120Days_ is a template designed for use with HelloID Service Automation (SA) Delegated Forms. It can be imported into HelloID and customized according to your requirements. 
+
 This HelloID Service Automation Delegated Form provides an Active Directory report containing the user accounts that have not logged on for at least 120 days. The following options are available:
- 1. Overview of AD user accounts that match this report
- 2. Export data to a local CSV file on the HelloID Agent server (optional)
+ 1. Overview of AD user accounts that have not logged on for at least 120 days
+ 2. Download the report data to CSV format
 
-## Versioning
-| Version | Description | Date |
-| - | - | - |
-| 1.0.2   | Added version number and updated code for SA-agent and auditlogging | 2022/08/03  |
-| 1.0.1   | Added version number and updated all-in-one script | 2021/11/04  |
-| 1.0.0   | Initial release | 2020/12/01  |
+## Getting started
+### Requirements
 
-<!-- TABLE OF CONTENTS -->
-## Table of Contents
-* [Description](#description)
-* [All-in-one PowerShell setup script](#all-in-one-powershell-setup-script)
-  * [Getting started](#getting-started)
-* [Post-setup configuration](#post-setup-configuration)
-* [Manual resources](#manual-resources)
-* [Getting help](#getting-help)
+- **HelloID Agent**:<br>
+  A HelloID Agent is required to execute PowerShell commands against the on-premises Active Directory. The agent must be installed on a server that has network access to the Active Directory domain controllers and the appropriate permissions to query AD.
 
+- **Active Directory PowerShell Module**:<br>
+  The Active Directory PowerShell module must be installed on the server where the HelloID Agent is running. This module is part of the Remote Server Administration Tools (RSAT) and provides the cmdlets necessary to query Active Directory.
 
-## All-in-one PowerShell setup script
-The PowerShell script "createform.ps1" contains a complete PowerShell script using the HelloID API to create the complete Form including user defined variables, tasks and data sources.
+- **Active Directory Permissions**:<br>
+  The account running the HelloID Agent service must have read permissions on the Active Directory organizational units (OUs) that will be queried for the report.
 
-_Please note that this script asumes none of the required resources do exists within HelloID. The script does not contain versioning or source control_
+### Connection settings
 
-### Getting started
-Please follow the documentation steps on [HelloID Docs](https://docs.helloid.com/hc/en-us/articles/360017556559-Service-automation-GitHub-resources) in order to setup and run the
+The following user-defined variables are used by the connector.
 
+| Setting          | Description                                                                                                                                                                                                                              | Mandatory |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| AdReportSearchOu | Is a string built with semicolon-separated OU paths:<br>`<OU path>;<OU path>`<br>Example: `OU=Disabled Users,OU=HelloID Training,DC=domain,DC=local;OU=Users,OU=HelloID Training,DC=domain,DC=local` | Yes       |
 
-## Post-setup configuration
-After the all-in-one PowerShell script has run and created all the required resources. The following items need to be configured according to your own environment
- 1. Update the following [user defined variables](https://docs.helloid.com/hc/en-us/articles/360014169933-How-to-Create-and-Manage-User-Defined-Variables)
-<table>
-  <tr><td><strong>Variable name</strong></td><td><strong>Example value</strong></td><td><strong>Description</strong></td></tr>
-  <tr><td>HIDreportFolder</td><td>C:\HIDreports\</td><td>Local folder on HelloID Agent server for exporting CSV reports</td></tr>
-  <tr><td>ADusersReportOU</td><td>[{ "OU": "OU=Employees,OU=Users,OU=Enyoi,DC=enyoi-media,DC=local"},{ "OU": "OU=Disabled,OU=Users,OU=Enyoi,DC=enyoi-media,DC=local"},{"OU": "OU=External,OU=Users,OU=Enyoi,DC=enyoi-media,DC=local"}]</td><td>Array of Active Directory OUs for scoping shown AD user accounts in this report</td></tr>
-</table>
+## Remarks
 
-## Manual resources
-This Delegated Form uses the following resources in order to run
+### Report Filter Criteria
+- **Not Logged On for 120 Days**: The report specifically identifies accounts where `lastLogonDate` is older than or equal to 120 days ago. This helps identify dormant accounts that have not been used for an extended period.
 
-### Powershell data source 'AD-user-generate-table-report-not-logged-on-120-days'
-This Powershell data source runs an Active Directory query to select the AD user accounts that match this report. It uses an array of Active Directory OU's specified as HelloID user defined variable named _"ADusersReportOU"_ to specify the report scoping.
+### Performance Considerations
+- **Multiple OU Search**: The data source searches through multiple OUs as specified in the `AdUsersReportOu` variable. If you have a large Active Directory environment with many OUs, consider limiting the scope to improve performance.
 
-### Delegated form task 'AD - Report - Accounts that have not logged on for at least 120 days'
-This delegated form task runs the same Active Directory query as the task data source (AD query is defined at two places) and export the data to a local CSV file if selected in the form.
+### CSV Download Feature
+- **Client-Side Download**: The form includes a CSV download button that allows users to export the report data directly from their browser without requiring server-side file generation.
+
+### No Task Actions
+- **Report Only**: This delegated form is designed for reporting purposes only and does not perform any actions on the accounts. The task script is a placeholder that performs no operations.
+
+## Development resources
+
+### PowerShell Cmdlets
+
+The following PowerShell cmdlets are used by the connector:
+
+| Cmdlet     | Description                              |
+|------------|------------------------------------------|
+| Get-ADUser | Retrieves Active Directory user accounts |
+
+### API documentation
+
+This connector uses the Active Directory PowerShell module which is part of Microsoft's Remote Server Administration Tools (RSAT). For more information, see the [Microsoft Active Directory PowerShell documentation](https://docs.microsoft.com/en-us/powershell/module/activedirectory/).
 
 ## Getting help
-_If you need help, feel free to ask questions on our [forum](https://forum.helloid.com/forum/helloid-connectors/service-automation/530-helloid-sa-active-directory-report-ad-accounts-not-logged-on-for-at-least-120days)_
+> :bulb: **Tip:**  
+> _For more information on Delegated Forms, please refer to our [documentation](https://docs.helloid.com/en/service-automation/delegated-forms.html) pages_.
 
-## HelloID Docs
+## HelloID docs
 The official HelloID documentation can be found at: https://docs.helloid.com/
