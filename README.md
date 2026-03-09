@@ -27,9 +27,9 @@ This HelloID Service Automation Delegated Form provides an Active Directory repo
 
 The following user-defined variables are used by the connector.
 
-| Setting         | Description                                                                                     | Mandatory |
-|-----------------|-------------------------------------------------------------------------------------------------|-----------|
-| AdUsersReportOu | Semicolon-separated list of AD OUs to search for accounts (e.g., "OU=Users,DC=domain,DC=local") | Yes       |
+| Setting          | Description                                                                                                                                                                                                                              | Mandatory |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| AdReportSearchOu | Is a string built with semicolon-separated OU paths:<br>`<OU path>;<OU path>`<br>Example: `OU=Disabled Users,OU=HelloID Training,DC=domain,DC=local;OU=Users,OU=HelloID Training,DC=domain,DC=local` | Yes       |
 
 ## Remarks
 

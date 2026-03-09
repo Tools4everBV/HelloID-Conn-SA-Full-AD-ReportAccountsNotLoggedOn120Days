@@ -16,9 +16,9 @@ $script:duplicateFormSuffix = "_tmp" #the suffix will be added to all HelloID re
 #NOTE: You can also update the HelloID Global variable values afterwards in the HelloID Admin Portal: https://<CUSTOMER>.helloid.com/admin/variablelibrary
 $globalHelloIDVariables = [System.Collections.Generic.List[object]]@();
 
-#Global variable #1 >> AdUsersReportOu
+#Global variable #1 >> AdReportSearchOu
 $tmpName = @'
-AdUsersReportOu
+AdReportSearchOu
 '@ 
 $tmpValue = @'
 OU=Users,OU=HelloID,DC=enyoi,DC=local;OU=Users,OU=HelloID Training,DC=enyoi,DC=local;OU=Disabled users,OU=HelloID Training,DC=enyoi,DC=local
